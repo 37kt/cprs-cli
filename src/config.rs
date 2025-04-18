@@ -21,12 +21,7 @@ struct Metadata {
 
 #[derive(Debug, Deserialize)]
 pub struct CargoCompete {
-    bin: Bin,
-}
-
-#[derive(Debug, Deserialize)]
-struct Bin {
-    problems: BTreeMap<String, Problem>,
+    bin: BTreeMap<String, Problem>,
 }
 
 #[derive(Debug, Deserialize)]
