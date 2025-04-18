@@ -48,7 +48,7 @@ enum Submit {
     #[serde(rename = "file")]
     File { path: String },
     #[serde(rename = "command")]
-    Command { command: String },
+    Command { args: Vec<String> },
 }
 
 pub fn load_config(
