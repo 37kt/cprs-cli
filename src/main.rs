@@ -1,7 +1,7 @@
 mod config;
 mod search_toml;
 
-use std::process::Command;
+use std::process::{Command, Stdio};
 
 use anyhow::Context;
 use arboard::Clipboard;
@@ -23,7 +23,6 @@ enum Commands {
 
 fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
-
     let problem_id = match cli.command {
         Commands::Submit { problem_id } => problem_id,
     };
@@ -55,14 +54,14 @@ fn main() -> anyhow::Result<()> {
         "bin_alias": &problem.alias,
     });
 
-    let mut clipboard = Clipboard::new()?;
+    let mut clipboard = Clipboard::new().unwrap();
 
     match config.submit {
         Submit::File { path } => {
             let path = ParserBuilder::with_stdlib().build()?.parse(&path)?;
             let path = path.render(&globals)?;
             let content = std::fs::read_to_string(&path)?;
-            clipboard.set_text(content)?;
+            clipboard.set_text(content).unwrap();
         }
         Submit::Command { args } => {
             let args = args
@@ -79,15 +78,16 @@ fn main() -> anyhow::Result<()> {
 
             let command = Command::new(&args[0])
                 .args(&args[1..])
+                .stdout(Stdio::piped())
                 .current_dir(&workspace_path)
                 .spawn()
                 .context("failed to run command")?;
 
             let output = command.wait_with_output()?;
             if output.status.success() {
-                clipboard.set_text(String::from_utf8(output.stdout).unwrap())?;
+                clipboard.set_text(String::from_utf8(output.stdout)?)?;
             } else {
-                eprintln!("{}", String::from_utf8(output.stderr).unwrap());
+                eprintln!("{}", String::from_utf8(output.stderr)?);
             }
         }
     }
