@@ -10,6 +10,7 @@ path = "src/main.rs"
 
 [dependencies]
 anyhow = "1.0.98"
+arboard = "3.5.0"
 clap = { version = "4.5.36", features = ["derive"] }
 liquid = "0.26.11"
 serde = { version = "1.0.219", features = ["derive"] }

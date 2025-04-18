@@ -1,7 +1,10 @@
 mod config;
 mod search_toml;
 
+use std::process::Command;
+
 use anyhow::Context;
+use arboard::Clipboard;
 use clap::{Parser, Subcommand};
 use config::{Submit, load_config};
 use liquid::{ParserBuilder, object};
@@ -46,18 +49,20 @@ fn main() -> anyhow::Result<()> {
         .context("problem not found")?;
 
     let globals = object!({
-        "src_path": workspace_path + "/" + &problem.path,
+        "src_path": workspace_path.clone() + "/" + &problem.path,
         "contest": &config.contest,
         "bin_name": &problem.name,
         "bin_alias": &problem.alias,
     });
+
+    let mut clipboard = Clipboard::new()?;
 
     match config.submit {
         Submit::File { path } => {
             let path = ParserBuilder::with_stdlib().build()?.parse(&path)?;
             let path = path.render(&globals)?;
             let content = std::fs::read_to_string(&path)?;
-            println!("{}", content);
+            clipboard.set_text(content)?;
         }
         Submit::Command { args } => {
             let args = args
@@ -71,7 +76,19 @@ fn main() -> anyhow::Result<()> {
                     arg.render(&globals).unwrap()
                 })
                 .collect::<Vec<_>>();
-            println!("{:?}", args);
+
+            let command = Command::new(&args[0])
+                .args(&args[1..])
+                .current_dir(&workspace_path)
+                .spawn()
+                .context("failed to run command")?;
+
+            let output = command.wait_with_output()?;
+            if output.status.success() {
+                clipboard.set_text(String::from_utf8(output.stdout).unwrap())?;
+            } else {
+                eprintln!("{}", String::from_utf8(output.stderr).unwrap());
+            }
         }
     }
 
