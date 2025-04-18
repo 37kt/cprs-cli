@@ -1,7 +1,9 @@
+mod config;
 mod parse_toml;
 mod search_toml;
 
 use clap::{Parser, Subcommand};
+use config::load_config;
 
 #[derive(Parser)]
 #[command(name = "cprs-cli", version, about, long_about = None)]
@@ -25,13 +27,14 @@ fn main() -> anyhow::Result<()> {
     }
 
     let cargo_toml_path = search_toml::search_toml_path("Cargo.toml")?;
-    let cargo_toml = parse_toml::parse_toml(&cargo_toml_path)?;
+    let cargo_toml = std::fs::read_to_string(cargo_toml_path)?;
 
     let compete_toml_path = search_toml::search_toml_path("compete.toml")?;
-    let compete_toml = parse_toml::parse_toml(&compete_toml_path)?;
+    let compete_toml = std::fs::read_to_string(compete_toml_path)?;
 
-    println!("Cargo.toml: {:?}", cargo_toml);
-    println!("compete.toml: {:?}", compete_toml);
+    let config = load_config(&cargo_toml)?;
+
+    eprintln!("{:?}", &config);
 
     Ok(())
 }
