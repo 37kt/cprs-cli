@@ -1,12 +1,10 @@
 use std::collections::BTreeMap;
 
-use anyhow::Context;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 pub struct CargoToml {
     package: Package,
-
     bin: Vec<Bin>,
 }
 
@@ -39,7 +37,25 @@ struct Problem {
     url: String,
 }
 
-pub fn load_config(cargo_toml: &str) -> anyhow::Result<CargoToml> {
+#[derive(Debug, Deserialize)]
+pub struct CompeteToml {
+    submit: Submit,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(tag = "kind")]
+enum Submit {
+    #[serde(rename = "file")]
+    File { path: String },
+    #[serde(rename = "command")]
+    Command { command: String },
+}
+
+pub fn load_config(
+    cargo_toml: &str,
+    compete_toml: &str,
+) -> anyhow::Result<(CargoToml, CompeteToml)> {
     let cargo_toml: CargoToml = toml::from_str(cargo_toml)?;
-    Ok(cargo_toml)
+    let compete_toml: CompeteToml = toml::from_str(compete_toml)?;
+    Ok((cargo_toml, compete_toml))
 }

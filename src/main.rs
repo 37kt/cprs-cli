@@ -29,12 +29,12 @@ fn main() -> anyhow::Result<()> {
     let cargo_toml_path = search_toml::search_toml_path("Cargo.toml")?;
     let cargo_toml = std::fs::read_to_string(cargo_toml_path)?;
 
-    // let compete_toml_path = search_toml::search_toml_path("compete.toml")?;
-    // let compete_toml = std::fs::read_to_string(compete_toml_path)?;
+    let compete_toml_path = search_toml::search_toml_path("compete.toml")?;
+    let compete_toml = std::fs::read_to_string(compete_toml_path)?;
 
-    let config = load_config(&cargo_toml)?;
+    let config = load_config(&cargo_toml, &compete_toml)?;
 
-    eprintln!("{:?}", &config);
+    eprintln!("{:#?}", &config);
 
     Ok(())
 }
