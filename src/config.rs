@@ -4,8 +4,16 @@ use anyhow::Context;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
-struct CargoToml {
+pub struct CargoToml {
     package: Package,
+
+    bin: Vec<Bin>,
+}
+
+#[derive(Debug, Deserialize)]
+struct Bin {
+    name: String,
+    path: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -31,7 +39,7 @@ struct Problem {
     url: String,
 }
 
-pub fn load_config(cargo_toml: &str) -> anyhow::Result<CargoCompete> {
+pub fn load_config(cargo_toml: &str) -> anyhow::Result<CargoToml> {
     let cargo_toml: CargoToml = toml::from_str(cargo_toml)?;
-    Ok(cargo_toml.package.metadata.cargo_compete)
+    Ok(cargo_toml)
 }
