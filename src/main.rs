@@ -1,8 +1,6 @@
 mod config;
 mod search_toml;
 
-use std::collections::BTreeMap;
-
 use anyhow::Context;
 use clap::{Parser, Subcommand};
 use config::{Submit, load_config};
@@ -47,9 +45,8 @@ fn main() -> anyhow::Result<()> {
         .find(|p| p.name == problem_id || p.alias == problem_id)
         .context("problem not found")?;
 
-    eprintln!("{:#?}", &config);
-
     let globals = object!({
+        "src_path": workspace_path + "/" + &problem.path,
         "contest": &config.contest,
         "bin_name": &problem.name,
         "bin_alias": &problem.alias,
@@ -57,7 +54,6 @@ fn main() -> anyhow::Result<()> {
 
     match config.submit {
         Submit::File { path } => {
-            let path = workspace_path + "/" + &path;
             let path = ParserBuilder::with_stdlib().build()?.parse(&path)?;
             let path = path.render(&globals)?;
             let content = std::fs::read_to_string(&path)?;
