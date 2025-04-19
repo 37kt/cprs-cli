@@ -83,6 +83,9 @@ fn main() -> anyhow::Result<()> {
                 eprintln!("stderr:\n{}", String::from_utf8_lossy(&output.stderr));
             } else {
                 let content = String::from_utf8_lossy(&output.stdout);
+
+                eprintln!("content: {}", content);
+
                 clipboard.set_text(content)?;
                 println!("copied to clipboard (status: {})", output.status);
             }
