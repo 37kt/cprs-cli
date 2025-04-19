@@ -54,8 +54,6 @@ fn main() -> anyhow::Result<()> {
         "bin_alias": &problem.alias,
     });
 
-    eprintln!("{:?}", globals);
-
     let mut clipboard = Clipboard::new().unwrap();
 
     match config.submit {
@@ -75,21 +73,18 @@ fn main() -> anyhow::Result<()> {
                 })
                 .collect::<anyhow::Result<Vec<_>>>()?;
 
-            eprintln!("{:?}", args);
-
-            let command = Command::new(&args[0])
+            let output = Command::new(&args[0])
                 .args(&args[1..])
-                .stderr(Stdio::piped())
                 .current_dir(&workspace_path)
-                .spawn()
+                .output()
                 .context("failed to run command")?;
 
-            let output = command.wait_with_output()?;
-            if output.status.success() {
-                clipboard.set_text(String::from_utf8(output.stdout)?)?;
-                println!("copied to clipboard.");
-            } else {
-                eprintln!("{}", String::from_utf8(output.stderr)?);
+            let stdout_str = String::from_utf8_lossy(&output.stdout);
+            clipboard.set_text(stdout_str.to_string())?;
+            println!("copied to clipboard (status: {})", output.status);
+
+            if !output.status.success() {
+                eprintln!("stderr:\n{}", String::from_utf8_lossy(&output.stderr));
             }
         }
     }
