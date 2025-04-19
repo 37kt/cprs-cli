@@ -54,6 +54,8 @@ fn main() -> anyhow::Result<()> {
         "bin_alias": &problem.alias,
     });
 
+    eprintln!("{:?}", globals);
+
     let mut clipboard = Clipboard::new().unwrap();
 
     match config.submit {
