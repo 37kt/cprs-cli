@@ -54,13 +54,12 @@ fn main() -> anyhow::Result<()> {
         "bin_alias": &problem.alias,
     });
 
-    let mut clipboard = Clipboard::new().unwrap();
-
     match config.submit {
         Submit::File { path } => {
             let path = ParserBuilder::with_stdlib().build()?.parse(&path)?;
             let path = path.render(&globals)?;
             let content = std::fs::read_to_string(&path)?;
+            let mut clipboard = Clipboard::new()?;
             clipboard.set_text(content)?;
             println!("copied to clipboard.");
         }
@@ -83,9 +82,7 @@ fn main() -> anyhow::Result<()> {
                 eprintln!("stderr:\n{}", String::from_utf8_lossy(&output.stderr));
             } else {
                 let content = String::from_utf8_lossy(&output.stdout);
-
-                eprintln!("content: {}", content);
-
+                let mut clipboard = Clipboard::new()?;
                 clipboard.set_text(content)?;
                 println!("copied to clipboard (status: {})", output.status);
             }
