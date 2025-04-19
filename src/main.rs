@@ -61,20 +61,16 @@ fn main() -> anyhow::Result<()> {
             let path = ParserBuilder::with_stdlib().build()?.parse(&path)?;
             let path = path.render(&globals)?;
             let content = std::fs::read_to_string(&path)?;
-            clipboard.set_text(content).unwrap();
+            clipboard.set_text(content)?;
         }
         Submit::Command { args } => {
             let args = args
                 .iter()
-                .map(|arg| {
-                    let arg = ParserBuilder::with_stdlib()
-                        .build()
-                        .unwrap()
-                        .parse(arg)
-                        .unwrap();
-                    arg.render(&globals).unwrap()
+                .map(|arg| -> anyhow::Result<String> {
+                    let arg = ParserBuilder::with_stdlib().build()?.parse(arg)?;
+                    Ok(arg.render(&globals)?)
                 })
-                .collect::<Vec<_>>();
+                .collect::<anyhow::Result<Vec<_>>>()?;
 
             let command = Command::new(&args[0])
                 .args(&args[1..])
@@ -91,6 +87,8 @@ fn main() -> anyhow::Result<()> {
             }
         }
     }
+
+    open::that(&problem.url)?;
 
     Ok(())
 }

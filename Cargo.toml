@@ -13,5 +13,6 @@ anyhow = "1.0.98"
 arboard = "3.5.0"
 clap = { version = "4.5.36", features = ["derive"] }
 liquid = "0.26.11"
+open = "5.3.2"
 serde = { version = "1.0.219", features = ["derive"] }
 toml = { version = "0.8.20", features = ["parse"] }
