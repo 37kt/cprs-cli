@@ -79,7 +79,6 @@ fn main() -> anyhow::Result<()> {
 
             let command = Command::new(&args[0])
                 .args(&args[1..])
-                .stdout(Stdio::piped())
                 .stderr(Stdio::piped())
                 .current_dir(&workspace_path)
                 .spawn()
