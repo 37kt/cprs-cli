@@ -1,7 +1,7 @@
 mod config;
 mod search_toml;
 
-use std::process::{Command, Stdio};
+use std::process::Command;
 
 use anyhow::Context;
 use arboard::Clipboard;
@@ -79,12 +79,12 @@ fn main() -> anyhow::Result<()> {
                 .output()
                 .context("failed to run command")?;
 
-            let stdout_str = String::from_utf8_lossy(&output.stdout);
-            clipboard.set_text(stdout_str.to_string())?;
-            println!("copied to clipboard (status: {})", output.status);
-
             if !output.status.success() {
                 eprintln!("stderr:\n{}", String::from_utf8_lossy(&output.stderr));
+            } else {
+                let content = String::from_utf8_lossy(&output.stdout);
+                clipboard.set_text(content)?;
+                println!("copied to clipboard (status: {})", output.status);
             }
         }
     }
