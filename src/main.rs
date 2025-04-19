@@ -62,6 +62,7 @@ fn main() -> anyhow::Result<()> {
             let path = path.render(&globals)?;
             let content = std::fs::read_to_string(&path)?;
             clipboard.set_text(content)?;
+            println!("copied to clipboard.");
         }
         Submit::Command { args } => {
             let args = args
@@ -83,12 +84,14 @@ fn main() -> anyhow::Result<()> {
             let output = command.wait_with_output()?;
             if output.status.success() {
                 clipboard.set_text(String::from_utf8(output.stdout)?)?;
+                println!("copied to clipboard.");
             } else {
                 eprintln!("{}", String::from_utf8(output.stderr)?);
             }
         }
     }
 
+    println!("opening {}", problem.url);
     open::that(&problem.url)?;
 
     Ok(())
