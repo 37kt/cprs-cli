@@ -75,6 +75,8 @@ fn main() -> anyhow::Result<()> {
                 })
                 .collect::<anyhow::Result<Vec<_>>>()?;
 
+            eprintln!("{:?}", args);
+
             let command = Command::new(&args[0])
                 .args(&args[1..])
                 .stdout(Stdio::piped())
