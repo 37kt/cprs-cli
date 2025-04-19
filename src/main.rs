@@ -59,6 +59,7 @@ fn main() -> anyhow::Result<()> {
             let path = ParserBuilder::with_stdlib().build()?.parse(&path)?;
             let path = path.render(&globals)?;
             let content = std::fs::read_to_string(&path)?;
+            eprintln!("content: {}", content);
             let mut clipboard = Clipboard::new()?;
             clipboard.set_text(content)?;
             println!("copied to clipboard.");
