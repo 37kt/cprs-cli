@@ -84,7 +84,7 @@ fn main() -> anyhow::Result<()> {
                 let content = String::from_utf8_lossy(&output.stdout);
                 let mut clipboard = Clipboard::new()?;
                 clipboard.set_text(content)?;
-                println!("copied to clipboard (status: {})", output.status);
+                println!("copied to clipboard ({})", output.status);
             }
         }
     }
